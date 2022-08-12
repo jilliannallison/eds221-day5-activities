@@ -1,0 +1,37 @@
+---
+title: "Runoff volumes"
+author: "Jillian Allison"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+```
+
+```{r}
+source(here("src","storm_runoff.R"))
+```
+
+```{r}
+impervious_fraction <- seq(from = 0.6, to = 0.8, by = 0.01)
+
+predicted_runoff <- predict_runoff(imperv_fraction = impervious_fraction, watershed_area = 182)
+
+runoff_df <- bind_cols(impervious_fraction, predicted_runoff)
+
+```
+
+```{r}
+ggplot(data = runoff_df, aes(x = impervious_fraction, y = predicted_runoff)) + 
+  geom_point() + 
+  geom_line() +
+  xlab("Impervious fraction of watershed area") +
+  ylab("Predicted runoff volume (cubic feet)") + 
+  labs(title = "Predicted runoff vs. impervious fraction of watershed area")
+
+ggsave(here("figs","runoff_plot.png"), width = 6, height = 5)
+```
+
