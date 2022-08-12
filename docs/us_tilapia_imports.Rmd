@@ -1,0 +1,52 @@
+---
+title: "US Tilapia Imports"
+author: "Jillian Allison"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(dplyr)
+```
+
+```{r}
+us_tilapia_imports <- read_csv(here("data","us_tilapia_imports.csv")) %>% 
+  pivot_longer(cols = -country, 
+               names_to = "year", 
+               values_to = "imports") %>% 
+  mutate(year = as.numeric(year))
+
+class(us_tilapia_imports$year)
+
+yearly_tilapia_tot <- us_tilapia_imports %>%
+  group_by(year) %>%
+  summarize(annual_sum = sum(imports, na.rm = TRUE))
+
+yearly_tilapia_total_gg <- ggplot(yearly_tilapia_tot, aes(x = year, y = annual_sum)) + 
+  geom_line() + 
+  xlab("Year") + 
+  ylab("Annual total US Tilapia Imports")
+
+ggsave(here("figs","annual_us_tilapia_imports.png"))
+
+yearly_tilapia_total_gg
+
+```
+
+```{r}
+central_am_imports <- filter(us_tilapia_imports, country %in% 
+                               c("Honduras","Ecuador","Costa Rica","Mexico"))
+
+ggplot(data = central_am_imports, aes(x = year, y = imports)) + 
+  geom_line(aes(color = country)) + 
+  xlab("Year") + 
+  ylab("Tilapia Imports")
+                                                                
+```
+
+
+
